@@ -1,3 +1,7 @@
+use crate::key_generator::generate_key;
+
+pub mod key_generator;
+
 fn main() {
-    println!("Hello world!");
+    generate_key();
 }
