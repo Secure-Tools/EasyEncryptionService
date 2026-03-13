@@ -6,6 +6,7 @@ use crate::helper::u8_to_string;
 pub mod key_generator;
 pub mod helper;
 pub mod rsa_service;
+mod aes_service;
 
 fn main() {
     let (pub_key, priv_key) = generate_key();
@@ -16,4 +17,5 @@ fn main() {
 
     println!("Extracted message: {extracted_message}");
 
+    aes_service::generate_aes_key();
 }
