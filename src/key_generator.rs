@@ -1,7 +1,6 @@
-use rsa::{Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey};
+use rsa::{RsaPrivateKey, RsaPublicKey};
 use rsa::pkcs8::EncodePrivateKey;
 use rsa::pkcs8::DecodePrivateKey;
-use rsa::pkcs8::LineEnding;
 
 pub fn generate_key() -> (RsaPublicKey, RsaPrivateKey){
     let mut rng = rand::rng();
@@ -11,6 +10,7 @@ pub fn generate_key() -> (RsaPublicKey, RsaPrivateKey){
 
     (public_key, private_key)
 }
+
 fn fetch_key_from_file(path : &str) -> rsa::RsaPrivateKey {
     rsa::RsaPrivateKey::read_pkcs8_der_file(path).expect("Could not read private key")
 }
