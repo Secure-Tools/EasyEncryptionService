@@ -8,6 +8,7 @@ pub mod key_generator;
 pub mod helper;
 pub mod rsa_service;
 pub mod aes_service;
+pub mod hybrid_encryption;
 
 fn main() {
     let (pub_key, priv_key) = generate_rsa_key();
