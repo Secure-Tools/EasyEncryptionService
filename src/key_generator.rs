@@ -2,9 +2,9 @@ use rsa::{RsaPrivateKey, RsaPublicKey};
 use rsa::pkcs8::EncodePrivateKey;
 use rsa::pkcs8::DecodePrivateKey;
 
-pub fn generate_key() -> (RsaPublicKey, RsaPrivateKey){
+pub fn generate_rsa_key() -> (RsaPublicKey, RsaPrivateKey){
     let mut rng = rand::rng();
-    let bits = 2048;
+    let bits = 4096;
     let private_key = RsaPrivateKey::new(&mut rng, bits).expect("Failed to generate key.");
     let public_key = RsaPublicKey::from(&private_key);
 
