@@ -1,20 +1,19 @@
 use rsa::{RsaPrivateKey, RsaPublicKey};
-use rsa::pkcs8::EncodePrivateKey;
-use rsa::pkcs8::DecodePrivateKey;
+use rsa::pkcs8::{EncodePrivateKey, DecodePrivateKey};
 
 pub fn generate_rsa_key() -> (RsaPublicKey, RsaPrivateKey){
     let mut rng = rand::rng();
-    let bits = 4096;
-    let private_key = RsaPrivateKey::new(&mut rng, bits).expect("Failed to generate key.");
+    const RSA_KEY_BITS: usize = 4096;
+    let private_key = RsaPrivateKey::new(&mut rng, RSA_KEY_BITS).expect("Failed to generate key.");
     let public_key = RsaPublicKey::from(&private_key);
 
     (public_key, private_key)
 }
 
-fn fetch_key_from_file(path : &str) -> rsa::RsaPrivateKey {
+pub fn fetch_key_from_file(path : &str) -> rsa::RsaPrivateKey {
     rsa::RsaPrivateKey::read_pkcs8_der_file(path).expect("Could not read private key")
 }
 
-fn save_key_to_file(path : &str, private_key : &rsa::RsaPrivateKey) {
+pub fn save_key_to_file(path : &str, private_key : &rsa::RsaPrivateKey) {
     private_key.write_pkcs8_der_file(path).expect("Could not write private key as PEM")
 }
