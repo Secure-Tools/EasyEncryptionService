@@ -4,7 +4,7 @@ use crate::rsa_service::decrypt_rsa;
 use crate::helper::u8_to_string;
 use crate::aes_service::{encrypt_aes, decrypt_aes};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
-use crate::packer::{pack, unpack};
+use crate::packer::{pack_message, unpack_message};
 
 pub mod key_generator;
 pub mod helper;
@@ -36,9 +36,9 @@ fn main() {
 
     let plain_text = b"Let's meet at 7PM!";
     let (cipher_text, nonce, enc_key) = encrypt_hybrid(plain_text, &pub_key);
-    let packed_data = pack(cipher_text, nonce, enc_key);
+    let packed_data = pack_message(cipher_text, nonce, enc_key);
     println!("Packed data: {}", packed_data);
-    let (cipher_text, nonce, enc_key) = unpack(packed_data);
+    let (cipher_text, nonce, enc_key) = unpack_message(packed_data);
     let extracted_text = decrypt_hybrid(&cipher_text, nonce, enc_key, &priv_key);
 
     println!("Packed extracted: {}", u8_to_string(extracted_text));
