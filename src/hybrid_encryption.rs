@@ -10,8 +10,24 @@ pub fn encrypt_hybrid(data: &[u8], pub_key : &RsaPublicKey) -> (Vec<u8>, AesNonc
     (cipher_text, nonce, encrypted_key)
 }
 
-pub fn decrypt_hybrid(cipher_text: &[u8], nonce:AesNonce, encrypted_key: Vec<u8>, priv_key: &RsaPrivateKey) -> Vec<u8> {
+pub fn decrypt_hybrid(cipher_text: &[u8], nonce:AesNonce, encrypted_key: &[u8], priv_key: &RsaPrivateKey) -> Vec<u8> {
     let key_vector = decrypt_rsa(&encrypted_key, priv_key);
     let key = Key::<Aes256Gcm>::from_slice(&key_vector);
     decrypt_aes(cipher_text, nonce, key)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::key_generator::generate_rsa_key;
+    use super::*;
+
+    #[test]
+    fn test_full_hybrid_cycle() {
+        let plain_text = b"Hello this is a test for hybrid encryption";
+        let (pub_key, priv_key) = generate_rsa_key();
+        let (cipher_text, nonce, key) = encrypt_hybrid(plain_text, &pub_key);
+        let decrypted_text = decrypt_hybrid(&cipher_text, nonce, &key, &priv_key);
+        assert_eq!(plain_text, decrypted_text.as_slice());
+    }
+
 }

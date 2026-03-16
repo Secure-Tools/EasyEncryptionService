@@ -17,3 +17,17 @@ pub fn decrypt_aes(ciphertext : &[u8], nonce : AesNonce, key : &Key<Aes256Gcm>) 
         .decrypt(&nonce, ciphertext.as_ref())
         .expect("Decryption error.")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_full_aes_cycle() {
+        let plain_text = b"Hello this is a test for AES";
+        let (cipher_text, nonce, key) = encrypt_aes(plain_text);
+        let decrypted_text = decrypt_aes(&cipher_text, nonce, &key);
+        assert_eq!(plain_text, decrypted_text.as_slice());
+    }
+
+}
