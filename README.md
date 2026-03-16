@@ -30,8 +30,8 @@ The hybrid encryption first encrypts the message with AES-GCM and then encrypts 
 ## Roadmap
 As of 14/03/2026 the following features are planned.
 - Base62 encoder/decoder for easy ciphertext sharing.
-- Signitures for checking messages authenticity. @str1ng0
-- CLI commands for creating keys and encrypted messages. @str1ng0
+- Signitures for checking messages authenticity. [@str1ng0](https://github.com/str1ng0)
+- CLI commands for creating keys and encrypted messages. [@str1ng0](https://github.com/str1ng0)
 
 The above features are for the software to function as basic as possible. For the future, the following would be great to implement.
 - Intuitive UI for generating public/private keys and messages.
