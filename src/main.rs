@@ -4,12 +4,14 @@ use crate::rsa_service::decrypt_rsa;
 use crate::helper::u8_to_string;
 use crate::aes_service::{encrypt_aes, decrypt_aes};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
+use crate::packer::{pack, unpack};
 
 pub mod key_generator;
 pub mod helper;
 pub mod rsa_service;
 pub mod aes_service;
 pub mod hybrid_encryption;
+pub mod packer;
 
 fn main() {
     let (pub_key, priv_key) = generate_rsa_key();
@@ -30,5 +32,5 @@ fn main() {
     let (cipher_text, nonce, enc_key) = encrypt_hybrid(plain_text, &pub_key);
     let extracted_text = decrypt_hybrid(&cipher_text, nonce, enc_key, &priv_key);
 
-    println!("Hybrid extraced: {}", u8_to_string(extracted_text));
+    println!("Hybrid extracted: {}", u8_to_string(extracted_text));
 }
