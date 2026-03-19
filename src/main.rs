@@ -3,7 +3,9 @@ use crate::helper::u8_to_string;
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
 use crate::packer::{pack_message, pack_public_key, unpack_message, unpack_public_key};
 use clap::{Parser, Subcommand};
-use anyhow;
+use anyhow::anyhow;
+use base_62::encode;
+use crate::signature::{create_signature, verify_signature};
 
 pub mod key_generator;
 pub mod helper;
@@ -11,6 +13,7 @@ pub mod rsa_service;
 pub mod aes_service;
 pub mod hybrid_encryption;
 pub mod packer;
+pub mod signature;
 
 #[derive(Parser)]
 #[command(name = "ees", about = "Easy encryption service CLI tool")]
@@ -27,8 +30,11 @@ enum Command {
         #[arg(short, long)]
         text: String,
         // Base62 encoded RSA public key
-        #[arg(short, long)]
-        pub_key: String
+        #[arg(short='p', long)]
+        pub_key: String,
+        /// Path to .pcks8 private key file (default: private_key.pkcs8)
+        #[arg(short, long, default_value = "private_key.pkcs8")]
+        key_file: String
     },
     /// Decrypts a text using your private key.
     Decrypt {
@@ -37,6 +43,12 @@ enum Command {
         /// Path to .pcks8 private key file (default: private_key.pkcs8)
         #[arg(short, long, default_value = "private_key.pkcs8")]
         key_file: String,
+        // Base62 encoded RSA public key
+        #[arg(short, long)]
+        pub_key: String,
+        // Base62 encoded signature, used for verifying authenticity
+        #[arg(short, long)]
+        signature: String
     }
 }
 fn main() -> anyhow::Result<()> {
@@ -50,18 +62,30 @@ fn main() -> anyhow::Result<()> {
             Private key has been saved to private_key.pkcs8. \n\
             Public key: {}", pack_public_key(&pub_key));
         }
-        Command::Encrypt {text, pub_key} => {
+        Command::Encrypt {text, pub_key, key_file} => {
+            let key_file = key_file.trim();
             let pub_key = pub_key.trim();
             let pub_key = unpack_public_key(pub_key)?;
+            let priv_key = &fetch_key_from_file(&key_file)?;
             let (cipher_text, nonce, enc_key) = encrypt_hybrid(text.as_bytes(), &pub_key)?;
             let packed_text = pack_message(&cipher_text, nonce, &enc_key);
+            let signature = create_signature(&packed_text, &priv_key)
+                .map_err(|e| anyhow!("Could not create signature: {}", e))?;
             println!("\nEncrypted message: {}", packed_text);
+            println!("\nSignature: {}", encode(&signature));
         }
-        Command::Decrypt {text, key_file} => {
+        Command::Decrypt {text, key_file, signature, pub_key} => {
             let key_file = key_file.trim();
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
+
+            let sig_bytes = base_62::decode(&signature)
+                .map_err(|e| anyhow!("Invalid signature: {:?}", e))?;
+            let pub_key = unpack_public_key(pub_key.as_str())?;
+            verify_signature(&text, &sig_bytes, &pub_key)
+                .map_err(|e| anyhow!("Signature verification failed: {}", e))?;
+            println!("Signature verified ✅");
         }
     }
     Ok(())
