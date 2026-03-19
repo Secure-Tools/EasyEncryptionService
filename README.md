@@ -13,14 +13,32 @@ RSA gives functionality to communicate without requiring an encrypted channel th
 AES-GCM compansates for the downsides of RSA by encrypting long messages securely.
 The hybrid encryption first encrypts the message with AES-GCM and then encrypts the AES-GCM key with recipients RSA public key.
 
-### Structure (TODO)
-
 ## Dependencies (TODO)
 
 ## Installation (TODO)
 
-## Usage (TODO)
-
+## Usage
+This section is to use the program with CLI tools. First go to the directory with the executable binary. By default,
+```bash
+cd EasyEncryptionService/target/build
+```
+The program offers 3 main functionalities:
+### Generation of public/private RSA keys:
+```bash
+./ees generate
+```
+This will output the public text encoded in base62 on the console and save private_key.pkcs8 as a file in the same directory.
+### Encrypting a text:
+```bash
+./ees encrypt -t "I want to encrypt this text" -p "PUBLIC KEY"
+```
+You need to input the text you want to encrypt after -t and the recipients public key after -p.
+This will output the encrypted block to be sent.
+### Decrypting a text:
+```bash
+./ees decrypt -t "ENCRYPTED BLOCK" -k "private_key.pkcs8"
+```
+Inputting the encrypted text after -t and private key file location after -k (it is private_key.pkcs8 by default) will give the decrypted text.
 ## Testing (TODO)
 
 ## Security policy (TODO)
@@ -29,9 +47,9 @@ The hybrid encryption first encrypts the message with AES-GCM and then encrypts 
 
 ## Roadmap
 As of 14/03/2026 the following features are planned.
-- Base62 encoder/decoder for easy ciphertext sharing.
+- Base62 encoder/decoder for easy ciphertext sharing. :white_check_mark:
 - Signitures for checking messages authenticity. [@str1ng0](https://github.com/str1ng0)
-- CLI commands for creating keys and encrypted messages. [@str1ng0](https://github.com/str1ng0)
+- CLI commands for creating keys and encrypted messages. [@benilevi05](https://github.com/benilevi05) :white_check_mark:
 
 The above features are for the software to function as basic as possible. For the future, the following would be great to implement.
 - Intuitive UI for generating public/private keys and messages.
