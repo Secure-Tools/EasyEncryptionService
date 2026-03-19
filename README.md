@@ -48,7 +48,7 @@ Inputting the encrypted text after -t and private key file location after -k (it
 ## Roadmap
 As of 14/03/2026 the following features are planned.
 - Base62 encoder/decoder for easy ciphertext sharing. :white_check_mark:
-- Signitures for checking messages authenticity. [@str1ng0](https://github.com/str1ng0)
+- Signatures for checking messages authenticity. [@str1ng0](https://github.com/str1ng0)
 - CLI commands for creating keys and encrypted messages. [@benilevi05](https://github.com/benilevi05) :white_check_mark:
 
 The above features are for the software to function as basic as possible. For the future, the following would be great to implement.
