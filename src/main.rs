@@ -1,10 +1,9 @@
 use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
 use crate::helper::u8_to_string;
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
-use crate::packer::{pack_message, pack_public_key, unpack_message, unpack_public_key};
+use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_public_key, unpack_signed_message};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
-use base_62::encode;
 use crate::signature::{create_signature, verify_signature};
 
 pub mod key_generator;
@@ -46,9 +45,6 @@ enum Command {
         // Base62 encoded RSA public key
         #[arg(short, long)]
         pub_key: String,
-        // Base62 encoded signature, used for verifying authenticity
-        #[arg(short, long)]
-        signature: String
     }
 }
 fn main() -> anyhow::Result<()> {
@@ -71,21 +67,20 @@ fn main() -> anyhow::Result<()> {
             let packed_text = pack_message(&cipher_text, nonce, &enc_key);
             let signature = create_signature(&packed_text, &priv_key)
                 .map_err(|e| anyhow!("Could not create signature: {}", e))?;
-            println!("\nEncrypted message: {}", packed_text);
-            println!("\nSignature: {}", encode(&signature));
+            let packed_signed_text = pack_signed_message(&packed_text, &signature);
+            println!("\nEncrypted message: {}", packed_signed_text);
         }
-        Command::Decrypt {text, key_file, signature, pub_key} => {
+        Command::Decrypt {text, key_file, pub_key} => {
             let key_file = key_file.trim();
+            let text = text.trim();
+            let (text, sig_bytes) = unpack_signed_message(&text)?;
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
-            let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
-            println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
-
-            let sig_bytes = base_62::decode(&signature)
-                .map_err(|e| anyhow!("Invalid signature: {:?}", e))?;
             let pub_key = unpack_public_key(pub_key.as_str())?;
             verify_signature(&text, &sig_bytes, &pub_key)
                 .map_err(|e| anyhow!("Signature verification failed: {}", e))?;
-            println!("Signature verified ✅");
+            let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
+            println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
+            println!("Signature verified");
         }
     }
     Ok(())

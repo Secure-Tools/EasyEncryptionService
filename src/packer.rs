@@ -38,6 +38,19 @@ pub fn unpack_public_key(pub_key_packed :&str) -> Result<RsaPublicKey> {
     Ok(RsaPublicKey::from_public_key_der(&der_bytes)?)
 }
 
+pub fn pack_signed_message(packed_message: &str, signature: &[u8]) -> String{
+    let signature_encoded = encode(signature);
+     format!("{packed_message}-{signature_encoded}")
+}
+
+pub fn unpack_signed_message(signed_message : &str) -> Result<(&str, Vec<u8>)>{
+    let mut split = signed_message.splitn(2, '-');
+    let packed_message = split.next().context("Missing cipher segment.")?;
+    let signature = decode(split.next().context("Missing signature segment.")?.trim())
+        .map_err(|e| anyhow::anyhow!("Failed to unpack the signature: {:?}", e))?;
+    Ok((packed_message, signature))
+}
+
 #[cfg(test)]
 mod tests {
     use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
