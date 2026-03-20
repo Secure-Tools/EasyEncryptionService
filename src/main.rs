@@ -1,5 +1,5 @@
 use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
-use crate::helper::u8_to_string;
+use crate::helper::{u8_to_string, check_priv_key_format};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
 use crate::packer::{pack_message, pack_public_key, unpack_message, unpack_public_key};
 use clap::{Parser, Subcommand};
@@ -59,6 +59,9 @@ fn main() -> anyhow::Result<()> {
         }
         Command::Decrypt {text, key_file} => {
             let key_file = key_file.trim();
+            if  !check_priv_key_format(key_file)?{
+                panic!("Invalid file format for private key!")
+            }
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
