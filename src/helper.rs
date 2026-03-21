@@ -14,7 +14,7 @@ pub fn check_priv_key_format(priv_key :&str) -> Result<bool> {
         return Ok(false)
     }
     let mut split = priv_key.split('.');
-    let name = split.next();
+    let _name = split.next();
     let extention = split.next().unwrap();
     if extention != "pkcs8" {
         return Ok(false)

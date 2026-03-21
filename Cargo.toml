@@ -3,6 +3,10 @@ name = "EasyEncryptionService"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "ees"
+path = "src/main.rs"
+
 [dependencies]
 rsa = "0.10.0-rc.17"
 rand = "0.10.0"
