@@ -13,47 +13,61 @@ RSA gives functionality to communicate without requiring an encrypted channel th
 AES-GCM compansates for the downsides of RSA by encrypting long messages securely.
 The hybrid encryption first encrypts the message with AES-GCM and then encrypts the AES-GCM key with recipients RSA public key.
 
-## Dependencies (TODO)
+## Installation
+### From release
+Download the latest binary for your platform from the Releases page. Binaries are available for Linux (x86_64), macOS (x86_64), and Windows (x86_64).
 
-## Installation (TODO)
+### Building from source
+Make sure you have Rust installed (edition 2024).
+```bash
+git clone https://github.com/Secure-Tools/EasyEncryptionService.git
+cd EasyEncryptionService
+cargo build --release
+```
+The compiled binary will be at target/release/ees (or ees.exe on Windows).
+
 
 ## Usage
-This section is to use the program with CLI tools. First go to the directory with the executable binary. By default,
-```bash
-cd EasyEncryptionService/target/build
-```
-The program offers 3 main functionalities:
+The program offers 3 main functionalities. Run from the directory containing the ees binary.
 ### Generation of public/private RSA keys:
 ```bash
 ./ees generate
 ```
-This will output the public text encoded in base62 on the console and save private_key.pkcs8 as a file in the same directory.
+This outputs the public key encoded in base62 to the console and saves private_key.pkcs8 in the current directory.
 ### Encrypting a text:
 ```bash
-./ees encrypt -t "I want to encrypt this text" -p "PUBLIC KEY"
+./ees encrypt -t "I want to encrypt this text" -p "RECIPIENT_PUBLIC_KEY" -k "private_key.pkcs8"
 ```
-You need to input the text you want to encrypt after -t and the recipients public key after -p.
-This will output the encrypted block to be sent.
+Provide the text after -t, the recipient's base62 public key after -p, and your private key file after -k. Alternatively,
+```bash
+./ees encrypt -t "I want to encrypt this text" -p "RECIPIENT_PUBLIC_KEY" 
+```
+which defaults -k to private_key.pkcs8. The message is encrypted and signed, then output as a base62 block.
 ### Decrypting a text:
 ```bash
-./ees decrypt -t "ENCRYPTED BLOCK" -k "private_key.pkcs8"
+./ees decrypt -t "ENCRYPTED_BLOCK" -p "SENDER_PUBLIC_KEY" -k "private_key.pkcs8"
 ```
-Inputting the encrypted text after -t and private key file location after -k (it is private_key.pkcs8 by default) will give the decrypted text.
-## Testing (TODO)
+Provide the encrypted block after -t, the sender's base62 public key after -p for signature verification, and your private key file after -k. Alternatively,
+```bash
+./ees decrypt -t "ENCRYPTED_BLOCK" -p "SENDER_PUBLIC_KEY"
+```
+which defaults -k to private_key.pkcs8. Outputs the decrypted text and confirms signature validity.
+## Testing
+Run the test suite with:
+```bash
+cargo test
+```
+Tests should be run before every commit.
+## Security policy
+If you discover a security vulnerability, please report it responsibly by opening a private security advisory on GitHub rather than a public issue. Do not disclose the vulnerability publicly until it has been addressed.
 
-## Security policy (TODO)
-
-## Contributing (TODO)
+## Contributing
+Contributions are welcome! Please fork the repository before making your changes. Make sure to test with ```cargo test```  and add tests for new functionalities before a pull request.
 
 ## Roadmap
-As of 14/03/2026 the following features are planned.
-- Base62 encoder/decoder for easy ciphertext sharing. :white_check_mark:
-- Signatures for checking messages authenticity. [@str1ng0](https://github.com/str1ng0)
-- CLI commands for creating keys and encrypted messages. [@benilevi05](https://github.com/benilevi05) :white_check_mark:
-
-The above features are for the software to function as basic as possible. For the future, the following would be great to implement.
+Planned features to implement:
 - Intuitive UI for generating public/private keys and messages.
-- Storing public/private key pairs with encryption and recipient public keys with names for easy message encryptions without future key exchanges. @str1ng0
+- Storing public/private key pairs with encryption and recipient public keys with names for easy message encryptions without future key exchanges.
 - A way to public key exchange with someone from the app itself without any hosted server.
 
 ## License
