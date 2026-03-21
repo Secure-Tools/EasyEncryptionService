@@ -66,8 +66,8 @@ Contributions are welcome! Please fork the repository before making your changes
 
 ## Roadmap
 Planned features to implement:
-- Intuitive UI for generating public/private keys and messages.
-- Storing public/private key pairs with encryption and recipient public keys with names for easy message encryptions without future key exchanges.
+- Intuitive UI for generating public/private keys and messages. [@str1ng0](https://github.com/str1ng0)
+- Storing public/private key pairs with encryption and recipient public keys with names for easy message encryptions without future key exchanges. [@str1ng0](https://github.com/str1ng0)
 - A way to public key exchange with someone from the app itself without any hosted server.
 
 ## License
