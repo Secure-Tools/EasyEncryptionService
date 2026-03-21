@@ -27,8 +27,8 @@ pub fn unpack_message(packed_cipher: &str) -> Result<(Vec<u8>, AesNonce,  Vec<u8
     Ok((ciphertext, nonce, enc_key))
 }
 
-pub fn pack_public_key(pub_key:&RsaPublicKey) -> String {
-    encode(pub_key.to_public_key_der().expect("Failed to der").as_bytes())
+pub fn pack_public_key(pub_key:&RsaPublicKey) -> Result<String> {
+    Ok(encode(pub_key.to_public_key_der()?.as_bytes()))
 }
 
 pub fn unpack_public_key(pub_key_packed :&str) -> Result<RsaPublicKey> {
@@ -71,7 +71,7 @@ mod tests {
     #[test]
     fn test_pack_for_public_key() {
         let (pub_key, _priv_key) = generate_rsa_key_test().unwrap();
-        let encoded_key = pack_public_key(&pub_key);
+        let encoded_key = pack_public_key(&pub_key).unwrap();
         let decoded_key = unpack_public_key(&encoded_key).unwrap();
         assert_eq!(pub_key,decoded_key);
     }
