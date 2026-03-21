@@ -27,13 +27,13 @@ pub fn decrypt_hybrid(cipher_text: &[u8], nonce:AesNonce, encrypted_key: &[u8], 
 
 #[cfg(test)]
 mod tests {
-    use crate::key_generator::generate_rsa_key;
+    use crate::key_generator::generate_rsa_key_test;
     use super::*;
 
     #[test]
     fn test_full_hybrid_cycle() {
         let plain_text = b"Hello this is a test for hybrid encryption";
-        let (pub_key, priv_key) = generate_rsa_key().unwrap();
+        let (pub_key, priv_key) = generate_rsa_key_test().unwrap();
         let (cipher_text, nonce, key) = encrypt_hybrid(plain_text, &pub_key).unwrap();
         let decrypted_text = decrypt_hybrid(&cipher_text, nonce, &key, &priv_key).unwrap();
         assert_eq!(plain_text, decrypted_text.as_slice());

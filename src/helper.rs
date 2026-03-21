@@ -1,3 +1,4 @@
+use std::path::Path;
 use aes_gcm::Aes256Gcm;
 use anyhow::{Result, anyhow};
 
@@ -9,15 +10,24 @@ pub fn u8_to_string(data: Vec<u8>) -> Result<String> {
 }
 
 pub fn check_priv_key_format(priv_key :&str) -> Result<bool> {
-    let split = priv_key.split('.');
-    if split.count() != 2 {
-        return Ok(false)
+    match Path::new(priv_key).extension() {
+        Some(ext) => Ok(ext == "pkcs8"),
+        None => Ok(false),
     }
-    let mut split = priv_key.split('.');
-    let _name = split.next();
-    let extention = split.next().unwrap();
-    if extention != "pkcs8" {
-        return Ok(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_priv_key_format_ok() {
+        let priv_file = "asd.pkcs8";
+        assert!(check_priv_key_format(priv_file).unwrap());
     }
-    Ok(true)
+    #[test]
+    fn test_priv_key_format_err() {
+        let priv_file = "asd.wrong";
+        assert!(!check_priv_key_format(priv_file).unwrap());
+    }
 }

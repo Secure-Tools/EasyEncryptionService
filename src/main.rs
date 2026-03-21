@@ -31,7 +31,7 @@ enum Command {
         // Base62 encoded RSA public key
         #[arg(short='p', long)]
         pub_key: String,
-        /// Path to .pcks8 private key file (default: private_key.pkcs8)
+        /// Path to .pkcs8 private key file (default: private_key.pkcs8)
         #[arg(short, long, default_value = "private_key.pkcs8")]
         key_file: String
     },
@@ -39,7 +39,7 @@ enum Command {
     Decrypt {
         #[arg(short, long)]
         text: String,
-        /// Path to .pcks8 private key file (default: private_key.pkcs8)
+        /// Path to .pkcs8 private key file (default: private_key.pkcs8)
         #[arg(short, long, default_value = "private_key.pkcs8")]
         key_file: String,
         // Base62 encoded RSA public key
@@ -56,10 +56,13 @@ fn main() -> anyhow::Result<()> {
             save_key_to_file("private_key.pkcs8", &priv_key)?;
             println!("\nRSA key generation successful! \n \
             Private key has been saved to private_key.pkcs8. \n\
-            Public key: {}", pack_public_key(&pub_key));
+            Public key: {}", pack_public_key(&pub_key)?);
         }
         Command::Encrypt {text, pub_key, key_file} => {
             let key_file = key_file.trim();
+            if  !check_priv_key_format(key_file)?{
+                return Err(anyhow!("Invalid file format..."))
+            }
             let pub_key = pub_key.trim();
             let pub_key = unpack_public_key(pub_key)?;
             let priv_key = &fetch_key_from_file(&key_file)?;
@@ -73,7 +76,7 @@ fn main() -> anyhow::Result<()> {
         Command::Decrypt {text, key_file, pub_key} => {
             let key_file = key_file.trim();
             if  !check_priv_key_format(key_file)?{
-                panic!("Invalid file format for private key!")
+                return Err(anyhow!("Invalid file format..."))
             }
             let text = text.trim();
             let (text, sig_bytes) = unpack_signed_message(&text)?;
