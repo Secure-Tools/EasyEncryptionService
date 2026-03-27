@@ -13,6 +13,7 @@ pub mod aes_service;
 pub mod hybrid_encryption;
 pub mod packer;
 pub mod signature;
+pub mod key_store;
 
 #[derive(Parser)]
 #[command(name = "ees", about = "Easy encryption service CLI tool")]
