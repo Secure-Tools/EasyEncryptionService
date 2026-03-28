@@ -2,6 +2,7 @@ use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_fi
 use crate::helper::{u8_to_string, check_priv_key_format};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_public_key, unpack_signed_message};
+use crate::key_store::{store};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
 use crate::signature::{create_signature, verify_signature};
@@ -46,6 +47,13 @@ enum Command {
         // Base62 encoded RSA public key
         #[arg(short, long)]
         pub_key: String,
+    },
+    /// Stores a public key
+    Store {
+        #[arg(short, long)]
+        name: String,
+        #[arg(short, long)]
+        pub_key: String,
     }
 }
 fn main() -> anyhow::Result<()> {
@@ -88,6 +96,10 @@ fn main() -> anyhow::Result<()> {
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
             println!("Signature verified");
+        }
+        Command::Store {name, pub_key} => {
+            store(name, pub_key);
+            println!("Public key stored!");
         }
     }
     Ok(())

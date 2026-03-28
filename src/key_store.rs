@@ -8,7 +8,7 @@ struct PKeyStore {
 }
 
 pub fn store(name: String, b62_encoded_key: String) {
-    let key_store = PKeyStore {key_name:name, encoded_key:b62_encoded_key};
+    let key_store = PKeyStore {key_name:name.trim().to_string(), encoded_key:b62_encoded_key.trim().to_string()};
 
     let file = File::create("keyring.json").expect("File couldnt be read/created.");
 
