@@ -21,6 +21,19 @@ pub fn store(name: String, b62_encoded_key: String) {
     serde_json::to_writer_pretty(file, &keyring).expect("Keyring failed to write.");
 }
 
+/// Given a name, returns the corresponding encoded public key in the keyring.
+pub fn get_key(name:&str) -> Option<String> {
+    let keyring: Keyring = get_keyring("keyring.json");
+    keyring.contacts.get(name).cloned()
+}
+/// Prints all the contacts.
+pub fn list_contacts() {
+    let keyring: Keyring = get_keyring("keyring.json");
+    for name in keyring.contacts.keys() {
+        println!("{}", name);
+    }
+}
+
 fn get_keyring(path: &str) -> Keyring {
     if Path::new(path).exists() {
         let contents = fs::read_to_string(path).expect("Failed to read");

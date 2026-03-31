@@ -2,7 +2,7 @@ use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_fi
 use crate::helper::{u8_to_string, check_priv_key_format};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_public_key, unpack_signed_message};
-use crate::key_store::{store};
+use crate::key_store::{list_contacts, store};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
 use crate::signature::{create_signature, verify_signature};
@@ -54,7 +54,8 @@ enum Command {
         name: String,
         #[arg(short, long)]
         pub_key: String,
-    }
+    },
+    List
 }
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
@@ -100,6 +101,9 @@ fn main() -> anyhow::Result<()> {
         Command::Store {name, pub_key} => {
             store(name, pub_key);
             println!("Public key stored!");
+        }
+        Command::List => {
+            list_contacts();
         }
     }
     Ok(())
