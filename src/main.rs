@@ -2,6 +2,7 @@ use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_fi
 use crate::helper::{u8_to_string, check_priv_key_format};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_public_key, unpack_signed_message};
+use crate::key_store::{list_contacts, store};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
 use crate::signature::{create_signature, verify_signature};
@@ -13,6 +14,7 @@ pub mod aes_service;
 pub mod hybrid_encryption;
 pub mod packer;
 pub mod signature;
+pub mod key_store;
 
 #[derive(Parser)]
 #[command(name = "ees", about = "Easy encryption service CLI tool")]
@@ -45,10 +47,19 @@ enum Command {
         // Base62 encoded RSA public key
         #[arg(short, long)]
         pub_key: String,
-    }
+    },
+    /// Stores a public key
+    Store {
+        #[arg(short, long)]
+        name: String,
+        #[arg(short, long)]
+        pub_key: String,
+    },
+    List
 }
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
+    let default_keyring = "keyring.json";
 
     match cli.command {
         Command::Generate => {
@@ -87,6 +98,13 @@ fn main() -> anyhow::Result<()> {
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
             println!("Signature verified");
+        }
+        Command::Store {name, pub_key} => {
+            store(name, pub_key, default_keyring);
+            println!("Public key stored!");
+        }
+        Command::List => {
+            list_contacts(default_keyring);
         }
     }
     Ok(())
