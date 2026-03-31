@@ -17,12 +17,11 @@ pub fn store(name: String, b62_encoded_key: String) {
         name.trim().to_string(), b62_encoded_key.trim().to_string()
     );
 
-    let file = fs::File::create("keyring.json").expect("File couldnt be read/created.");
-    serde_json::to_writer_pretty(file, &keyring).expect("Keyring failed to write.");
+    write_keyring(keyring);
 }
 
 /// Given a name, returns the corresponding encoded public key in the keyring.
-pub fn get_key(name:&str) -> Option<String> {
+pub fn get_enc_key(name:&str) -> Option<String> {
     let keyring: Keyring = get_keyring("keyring.json");
     keyring.contacts.get(name).cloned()
 }
@@ -34,6 +33,13 @@ pub fn list_contacts() {
     }
 }
 
+pub fn delete_contact(name: &str) {
+    let mut keyring: Keyring = get_keyring("keyring.json");
+    keyring.contacts.remove(name);
+    write_keyring(keyring);
+
+}
+
 fn get_keyring(path: &str) -> Keyring {
     if Path::new(path).exists() {
         let contents = fs::read_to_string(path).expect("Failed to read");
@@ -41,4 +47,9 @@ fn get_keyring(path: &str) -> Keyring {
     } else {
         Keyring::default()
     }
+}
+
+fn write_keyring(keyring: Keyring) {
+    let file = fs::File::create("keyring.json").expect("File couldnt be read/created.");
+    serde_json::to_writer_pretty(file, &keyring).expect("Keyring failed to write.");
 }
