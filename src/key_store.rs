@@ -1,16 +1,31 @@
-use std::fs::File;
-use serde::Serialize;
+use std::collections::HashMap;
+use std::fs;
+use serde::{Deserialize, Serialize};
+use std::path::Path;
+use serde_json;
 
-#[derive(Serialize)]
-struct PKeyStore {
-    key_name: String,
-    encoded_key: String
+#[derive(Serialize, Deserialize, Default)]
+struct Keyring {
+    contacts: HashMap<String, String>
 }
 
 pub fn store(name: String, b62_encoded_key: String) {
-    let key_store = PKeyStore {key_name:name.trim().to_string(), encoded_key:b62_encoded_key.trim().to_string()};
+    let path = "keyring.json";
+    let mut keyring : Keyring = get_keyring(path);
 
-    let file = File::create("keyring.json").expect("File couldnt be read/created.");
+    keyring.contacts.insert(
+        name.trim().to_string(), b62_encoded_key.trim().to_string()
+    );
 
-    serde_json::to_writer_pretty(file, &key_store).expect("Keyring failed to write.");
+    let file = fs::File::create("keyring.json").expect("File couldnt be read/created.");
+    serde_json::to_writer_pretty(file, &keyring).expect("Keyring failed to write.");
+}
+
+fn get_keyring(path: &str) -> Keyring {
+    if Path::new(path).exists() {
+        let contents = fs::read_to_string(path).expect("Failed to read");
+        serde_json::from_str(&contents).expect("Failed to create json from string.")
+    } else {
+        Keyring::default()
+    }
 }
