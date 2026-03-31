@@ -59,6 +59,7 @@ enum Command {
 }
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
+    let default_keyring = "keyring.json";
 
     match cli.command {
         Command::Generate => {
@@ -99,11 +100,11 @@ fn main() -> anyhow::Result<()> {
             println!("Signature verified");
         }
         Command::Store {name, pub_key} => {
-            store(name, pub_key);
+            store(name, pub_key, default_keyring);
             println!("Public key stored!");
         }
         Command::List => {
-            list_contacts();
+            list_contacts(default_keyring);
         }
     }
     Ok(())
