@@ -77,7 +77,7 @@ fn main() -> anyhow::Result<()> {
                 return Err(anyhow!("Invalid file format..."))
             }
             let priv_key = &fetch_key_from_file(&key_file)?;
-            let (cipher_text, nonce, enc_key) = encrypt_hybrid_name(text.as_bytes(), &name)?;
+            let (cipher_text, nonce, enc_key) = encrypt_hybrid_name(text.as_bytes(), name.trim())?;
             let packed_text = pack_message(&cipher_text, nonce, &enc_key);
             let signature = create_signature(&packed_text, &priv_key)
                 .map_err(|e| anyhow!("Could not create signature: {}", e))?;
@@ -92,7 +92,7 @@ fn main() -> anyhow::Result<()> {
             let text = text.trim();
             let (text, sig_bytes) = unpack_signed_message(&text)?;
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
-            verify_signature_name(&text, &sig_bytes, &name)
+            verify_signature_name(&text, &sig_bytes, name.trim())
                 .map_err(|e| anyhow!("Signature verification failed: {}", e))?;
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
