@@ -32,10 +32,14 @@ pub fn list_contacts(path: &str) {
     }
 }
 /// Given a name, removes the name and corresponding public key from the keyring.
-pub fn delete_contact(name: &str, path: &str) {
+pub fn delete_contact(name: &str, path: &str) -> bool {
     let mut keyring: Keyring = get_keyring(path);
+    if !keyring.contacts.contains_key(name) {
+        return false
+    }
     keyring.contacts.remove(name);
     write_keyring(keyring, path);
+    true
 
 }
 /// Stores a base62 encoded public key - private key location pair. Overwrites the previous.

@@ -107,9 +107,14 @@ fn main() -> anyhow::Result<()> {
             println!("Public key stored!");
         }
         Command::Delete {name} => {
-            delete_contact(name.trim(), default_keyring);
-            println!("Contact {} deleted!", name);
+            let res = delete_contact(name.trim(), default_keyring);
+            if res == true {
+                println!("Contact {} deleted!", name);
+            } else {
+                println!("{} not in the keyring!", name);
+            }
         }
+
         Command::List => {
             list_contacts(default_keyring);
         }
