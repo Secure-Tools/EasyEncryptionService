@@ -28,28 +28,43 @@ The compiled binary will be at target/release/ees (or ees.exe on Windows).
 
 
 ## Usage
-The program offers 3 main functionalities. Run from the directory containing the ees binary.
+The program offers the following CLI commands. Run from the directory containing the ees binary.
 ### Generation of public/private RSA keys:
 ```bash
 ./ees generate
 ```
-This outputs the public key encoded in base62 to the console and saves private_key.pkcs8 in the current directory.
+This saves private_key.pkcs8 in the current directory and updates the keyring_yours.json file with the base62 encoded public key / path to private key.
+### Store public RSA key:
+```bash
+./ees store -n "CONTACT_NAME" -p "CONTACT_PUBLIC_KEY"
+```
+This stores the name of the contact and their base62 encoded public key to keyring.json. You need to store the contact before encrypting / decrypting messages.
+### Delete a contact:
+```bash
+./ees delete -n "CONTACT_NAME"
+```
+Deletes a contact and the corresponding encoded public key from your contact list.
+### List contacts:
+```bash
+./ees list
+```
+Lists all the names in your contacts. You can only use these for encryption and decryption. Use store command to add more.
 ### Encrypting a text:
 ```bash
-./ees encrypt -t "I want to encrypt this text" -p "RECIPIENT_PUBLIC_KEY" -k "private_key.pkcs8"
+./ees encrypt -t "I want to encrypt this text" -n "RECIPIENT_NAME" -k "private_key.pkcs8"
 ```
-Provide the text after -t, the recipient's base62 public key after -p, and your private key file after -k. Alternatively,
+Provide the text after -t, the recipient's name saved in keyring.json after -n, and your private key file after -k. Alternatively,
 ```bash
-./ees encrypt -t "I want to encrypt this text" -p "RECIPIENT_PUBLIC_KEY" 
+./ees encrypt -t "I want to encrypt this text" -n "RECIPIENT_NAME" 
 ```
 which defaults -k to private_key.pkcs8. The message is encrypted and signed, then output as a base62 block.
 ### Decrypting a text:
 ```bash
-./ees decrypt -t "ENCRYPTED_BLOCK" -p "SENDER_PUBLIC_KEY" -k "private_key.pkcs8"
+./ees decrypt -t "ENCRYPTED_BLOCK" -n "SENDER_NAME" -k "private_key.pkcs8"
 ```
-Provide the encrypted block after -t, the sender's base62 public key after -p for signature verification, and your private key file after -k. Alternatively,
+Provide the encrypted block after -t, the sender's name saved in keyring.json after -n for signature verification, and your private key file after -k. Alternatively,
 ```bash
-./ees decrypt -t "ENCRYPTED_BLOCK" -p "SENDER_PUBLIC_KEY"
+./ees decrypt -t "ENCRYPTED_BLOCK" -n "SENDER_NAME"
 ```
 which defaults -k to private_key.pkcs8. Outputs the decrypted text and confirms signature validity.
 ## Testing
@@ -67,7 +82,6 @@ Contributions are welcome! Please fork the repository before making your changes
 ## Roadmap
 Planned features to implement:
 - Intuitive UI for generating public/private keys and messages. [@str1ng0](https://github.com/str1ng0)
-- Storing public/private key pairs with encryption and recipient public keys with names for easy message encryptions without future key exchanges. [@str1ng0](https://github.com/str1ng0)
 - A way to public key exchange with someone from the app itself without any hosted server.
 
 ## License
