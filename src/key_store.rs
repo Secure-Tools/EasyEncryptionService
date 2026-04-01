@@ -22,7 +22,7 @@ pub fn store(name: String, b62_encoded_key: String, path: &str) {
 /// Given a name, returns the corresponding encoded public key in the keyring.
 pub fn get_enc_key(name:&str, path:&str) -> Option<String> {
     let keyring: Keyring = get_keyring(path);
-    keyring.contacts.get(name).cloned()
+    keyring.contacts.get(name.trim()).cloned()
 }
 /// Prints all the contacts.
 pub fn list_contacts(path: &str) {
