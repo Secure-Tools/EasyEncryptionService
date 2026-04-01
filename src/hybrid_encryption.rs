@@ -29,7 +29,8 @@ pub fn decrypt_hybrid(cipher_text: &[u8], nonce:AesNonce, encrypted_key: &[u8], 
 
 pub fn encrypt_hybrid_name(plain_text: &[u8], recipient_name:&str) -> Result<(Vec<u8>, AesNonce, Vec<u8>)>{
     let (cipher_text, nonce, key) = encrypt_aes(plain_text)?;
-    let pub_key = get_enc_key(recipient_name, "keyring.json").ok_or_else(|| anyhow!("No public key found for {}", recipient_name))?;
+    let pub_key = get_enc_key(recipient_name, "keyring.json")
+        .ok_or_else(|| anyhow!("No public key found for {}. Use store command to add.", recipient_name))?;
     let encrypted_key = encrypt_rsa(&key, &unpack_public_key(&pub_key)?)?;
     Ok((cipher_text, nonce, encrypted_key))
 }

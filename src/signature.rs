@@ -20,7 +20,8 @@ pub fn verify_signature(cipher_text: &str, signature: &[u8], pub_key: &RsaPublic
 
 pub fn verify_signature_name(cipher_text: &str, signature: &[u8], name: &str) -> Result<()> {
     let digest = Sha256::digest(cipher_text);
-    let pub_key = get_enc_key(name, "keyring.json").ok_or_else(|| anyhow!("No public key found for '{}'", name))?;
+    let pub_key = get_enc_key(name, "keyring.json")
+        .ok_or_else(|| anyhow!("No public key found for '{}'. Use store command to add.", name))?;
     unpack_public_key(&pub_key)?.verify(Pkcs1v15Sign::new::<Sha256>(), &digest, signature)
         .map_err(|e| anyhow!("Verification failed: {:?}", e))
 }

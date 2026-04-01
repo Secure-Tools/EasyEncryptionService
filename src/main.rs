@@ -1,11 +1,11 @@
 use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
 use crate::helper::{u8_to_string, check_priv_key_format};
-use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid};
-use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_public_key, unpack_signed_message};
-use crate::key_store::{get_enc_key, list_contacts, store, store_pub_priv_pair};
+use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid_name};
+use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
+use crate::key_store::{list_contacts, store, store_pub_priv_pair};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
-use crate::signature::{create_signature, verify_signature};
+use crate::signature::{create_signature, verify_signature_name};
 
 pub mod key_generator;
 pub mod helper;
@@ -73,14 +73,11 @@ fn main() -> anyhow::Result<()> {
         }
         Command::Encrypt {text, name, key_file} => {
             let key_file = key_file.trim();
-            let pub_key = get_enc_key(&name, default_keyring).expect("Name not found in keyring.json. Use store command to add");
             if  !check_priv_key_format(key_file)?{
                 return Err(anyhow!("Invalid file format..."))
             }
-            let pub_key = pub_key.trim();
-            let pub_key = unpack_public_key(pub_key)?;
             let priv_key = &fetch_key_from_file(&key_file)?;
-            let (cipher_text, nonce, enc_key) = encrypt_hybrid(text.as_bytes(), &pub_key)?;
+            let (cipher_text, nonce, enc_key) = encrypt_hybrid_name(text.as_bytes(), &name)?;
             let packed_text = pack_message(&cipher_text, nonce, &enc_key);
             let signature = create_signature(&packed_text, &priv_key)
                 .map_err(|e| anyhow!("Could not create signature: {}", e))?;
@@ -89,15 +86,13 @@ fn main() -> anyhow::Result<()> {
         }
         Command::Decrypt {text, key_file, name} => {
             let key_file = key_file.trim();
-            let pub_key = get_enc_key(&name, default_keyring).expect("Name not found in keyring.json. Use store command to add");
             if  !check_priv_key_format(key_file)?{
                 return Err(anyhow!("Invalid file format..."))
             }
             let text = text.trim();
             let (text, sig_bytes) = unpack_signed_message(&text)?;
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
-            let pub_key = unpack_public_key(pub_key.as_str())?;
-            verify_signature(&text, &sig_bytes, &pub_key)
+            verify_signature_name(&text, &sig_bytes, &name)
                 .map_err(|e| anyhow!("Signature verification failed: {}", e))?;
             let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
