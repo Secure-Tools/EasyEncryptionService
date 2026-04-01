@@ -26,7 +26,7 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     Generate,
-    /// Encrypts a text using a base62 encoded RSA public key.
+    /// Encrypts a text using recipient's base62 encoded RSA public key.
     Encrypt {
         #[arg(short, long)]
         text: String,
@@ -37,7 +37,7 @@ enum Command {
         #[arg(short, long, default_value = "private_key.pkcs8")]
         key_file: String
     },
-    /// Decrypts a text using your private key.
+    /// Decrypts a text using your private key. Verify signature with senders public key.
     Decrypt {
         #[arg(short, long)]
         text: String,
