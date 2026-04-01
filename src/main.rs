@@ -2,7 +2,7 @@ use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_fi
 use crate::helper::{u8_to_string, check_priv_key_format};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid_name};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
-use crate::key_store::{list_contacts, store, store_pub_priv_pair};
+use crate::key_store::{delete_contact, list_contacts, store, store_pub_priv_pair};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
 use crate::signature::{create_signature, verify_signature_name};
@@ -55,6 +55,10 @@ enum Command {
         #[arg(short, long)]
         pub_key: String,
     },
+    Delete {
+      #[arg(short, long)]
+      name: String,
+    },
     List
 }
 fn main() -> anyhow::Result<()> {
@@ -101,6 +105,10 @@ fn main() -> anyhow::Result<()> {
         Command::Store {name, pub_key} => {
             store(name, pub_key, default_keyring);
             println!("Public key stored!");
+        }
+        Command::Delete {name} => {
+            delete_contact(name.trim(), default_keyring);
+            println!("Contact {} deleted!", name);
         }
         Command::List => {
             list_contacts(default_keyring);
