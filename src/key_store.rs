@@ -38,6 +38,20 @@ pub fn delete_contact(name: &str, path: &str) {
     write_keyring(keyring, path);
 
 }
+/// Stores a base62 encoded public key - private key location pair. Overwrites the previous.
+pub fn store_pub_priv_pair(enc_pub_key : &str, priv_key_path : &str) {
+    let mut keyring : Keyring = Keyring::default();
+    keyring.contacts.insert(enc_pub_key.trim().to_string(), priv_key_path.trim().to_string());
+    write_keyring(keyring, "keyring_yours.json");
+}
+
+//Gets a base62 encoded public key - private key location pair.
+pub fn get_pub_priv_pair() -> (String, String) {
+    let keyring : Keyring = get_keyring("keyring_yours.json");
+    let mut key_iter = keyring.contacts.iter();
+    let (pub_key, priv_key) = key_iter.next().expect("Public private key pair not found! Use the generate function.");
+    (pub_key.to_string(), priv_key.to_string())
+}
 
 fn get_keyring(path: &str) -> Keyring {
     if Path::new(path).exists() {
