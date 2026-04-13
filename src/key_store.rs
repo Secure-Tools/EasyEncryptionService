@@ -31,6 +31,15 @@ pub fn list_contacts(path: &str) {
         println!("{}", name);
     }
 }
+
+pub fn list_contacts_vector(path: &str) -> Vec<(String,String)> {
+    let mut names = Vec::<(String,String)>::new();
+    let keyring: Keyring = get_keyring(path);
+    for (name, key) in keyring.contacts.iter() {
+        names.push((name.trim().to_string(), key.trim().to_string()));
+    }
+    return names;
+}
 /// Given a name, removes the name and corresponding public key from the keyring.
 pub fn delete_contact(name: &str, path: &str) -> bool {
     let mut keyring: Keyring = get_keyring(path);

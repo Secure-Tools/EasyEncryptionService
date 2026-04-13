@@ -15,6 +15,7 @@ pub mod hybrid_encryption;
 pub mod packer;
 pub mod signature;
 pub mod key_store;
+pub mod ui;
 
 #[derive(Parser)]
 #[command(name = "ees", about = "Easy encryption service CLI tool")]
@@ -62,6 +63,13 @@ enum Command {
     List
 }
 fn main() -> anyhow::Result<()> {
+    // If no args (just the binary name), launch TUI
+    if std::env::args().len() <= 1 {
+        ui::run()?;
+        return Ok(());
+    }
+
+    // Else, use the CLI args
     let cli = Cli::parse();
     let default_keyring = "keyring.json";
 
