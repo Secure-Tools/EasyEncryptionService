@@ -73,6 +73,15 @@ Run the test suite with:
 cargo test
 ```
 Tests should be run before every commit.
+## Security
+EES uses the following cryptographic primitives:
+- **AES-256-GCM** via the [`aes-gcm`](https://github.com/RustCrypto/AEADs/tree/master/aes-gcm) crate (RustCrypto)
+- **RSA-4096 with OAEP + PSS** via the [`rsa`](https://github.com/RustCrypto/RSA) crate (RustCrypto)
+
+The rsa`crate crate has an open timing side-channel advisory ([RUSTSEC-2023-0071](https://rustsec.org/advisories/RUSTSEC-2023-0071), Marvin Attack).
+The advisory affects network decryption while our implementation handles all encryption/decryption on local device only so this vulnerability does not apply to 
+this use case.
+
 ## Security policy
 If you discover a security vulnerability, please report it responsibly by opening a private security advisory on GitHub rather than a public issue. Do not disclose the vulnerability publicly until it has been addressed.
 
@@ -82,7 +91,8 @@ Contributions are welcome! Please fork the repository before making your changes
 ## Roadmap
 Planned features to implement:
 - Intuitive UI for generating public/private keys and messages. [@str1ng0](https://github.com/str1ng0)
-- A way to public key exchange with someone from the app itself without any hosted server.
+- Passphrase encryption for private key files. [@benilevi05](https://github.com/benilevi05)
+- Clipboard integration. [@benilevi05](https://github.com/benilevi05)
 
 ## License
 The project is licensed under MIT License which is described in the LICENSE file.
