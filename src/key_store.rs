@@ -27,6 +27,7 @@ pub fn get_enc_key(name:&str, path:&str) -> Option<String> {
 /// Prints all the contacts.
 pub fn list_contacts(path: &str) {
     let keyring: Keyring = get_keyring(path);
+    
     for name in keyring.contacts.keys() {
         println!("{}", name);
     }

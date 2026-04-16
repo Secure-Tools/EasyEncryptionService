@@ -1,5 +1,6 @@
 use std::path::Path;
 use aes_gcm::Aes256Gcm;
+use rpassword;
 use anyhow::{Result, anyhow};
 
 pub type AesNonce = aes_gcm::aead::Nonce<Aes256Gcm>;
@@ -14,6 +15,10 @@ pub fn check_priv_key_format(priv_key :&str) -> Result<bool> {
         Some(ext) => Ok(ext == "pkcs8"),
         None => Ok(false),
     }
+}
+
+pub fn ask_for_passphrase() -> Result<String> {
+    Ok(rpassword::prompt_password("Your password: ")?)
 }
 
 #[cfg(test)]
