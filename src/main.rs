@@ -1,5 +1,5 @@
 use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
-use crate::helper::{u8_to_string, check_priv_key_format};
+use crate::helper::{u8_to_string, check_priv_key_format, ask_for_passphrase};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid_name};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
 use crate::key_store::{delete_contact, list_contacts, store, store_pub_priv_pair};
@@ -69,7 +69,8 @@ fn main() -> anyhow::Result<()> {
         Command::Generate => {
             let priv_key_path = "private_key.pkcs8";
             let (pub_key, priv_key) = generate_rsa_key()?;
-            save_key_to_file(priv_key_path, &priv_key)?;
+            let password = ask_for_passphrase()?;
+            save_key_to_file(priv_key_path, &priv_key, &password)?;
             store_pub_priv_pair(&pack_public_key(&pub_key)?, priv_key_path);
             println!("\nRSA key generation successful! \n \
             Private key has been saved to private_key.pkcs8. \n\
@@ -80,7 +81,8 @@ fn main() -> anyhow::Result<()> {
             if  !check_priv_key_format(key_file)?{
                 return Err(anyhow!("Invalid file format..."))
             }
-            let priv_key = &fetch_key_from_file(&key_file)?;
+            let password = ask_for_passphrase()?;
+            let priv_key = &fetch_key_from_file(&key_file, &password)?;
             let (cipher_text, nonce, enc_key) = encrypt_hybrid_name(text.as_bytes(), name.trim())?;
             let packed_text = pack_message(&cipher_text, nonce, &enc_key);
             let signature = create_signature(&packed_text, &priv_key)
@@ -98,7 +100,8 @@ fn main() -> anyhow::Result<()> {
             let (cipher_text, nonce, enc_key) = unpack_message(&text)?;
             verify_signature_name(&text, &sig_bytes, name.trim())
                 .map_err(|e| anyhow!("Signature verification failed: {}", e))?;
-            let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file)?)?;
+            let password = ask_for_passphrase()?;
+            let extracted_text = decrypt_hybrid(&cipher_text, nonce, &enc_key , &fetch_key_from_file(&key_file, &password)?)?;
             println!("\nDecrypted message: {}", u8_to_string(extracted_text)?);
             println!("Signature verified");
         }
