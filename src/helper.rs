@@ -1,6 +1,7 @@
 use std::path::Path;
 use aes_gcm::Aes256Gcm;
 use rpassword;
+use arboard;
 use anyhow::{Result, anyhow};
 
 pub type AesNonce = aes_gcm::aead::Nonce<Aes256Gcm>;
@@ -19,6 +20,11 @@ pub fn check_priv_key_format(priv_key :&str) -> Result<bool> {
 
 pub fn ask_for_passphrase() -> Result<String> {
     Ok(rpassword::prompt_password("Your password: ")?)
+}
+
+pub fn copy_message_to_clipboard(message : &str) -> Result<()> {
+    let mut clipboard = arboard::Clipboard::new()?;
+    Ok(clipboard.set_text(message)?)
 }
 
 #[cfg(test)]

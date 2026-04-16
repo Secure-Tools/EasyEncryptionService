@@ -1,5 +1,5 @@
 use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
-use crate::helper::{u8_to_string, check_priv_key_format, ask_for_passphrase};
+use crate::helper::{u8_to_string, check_priv_key_format, ask_for_passphrase, copy_message_to_clipboard};
 use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid_name};
 use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
 use crate::key_store::{delete_contact, list_contacts, store, store_pub_priv_pair};
@@ -72,9 +72,10 @@ fn main() -> anyhow::Result<()> {
             let password = ask_for_passphrase()?;
             save_key_to_file(priv_key_path, &priv_key, &password)?;
             store_pub_priv_pair(&pack_public_key(&pub_key)?, priv_key_path);
+            copy_message_to_clipboard(&pack_public_key(&pub_key)?)?;
             println!("\nRSA key generation successful! \n \
             Private key has been saved to private_key.pkcs8. \n\
-            Public key saved to keyring_yours.json.");
+            Public key saved to clipboard and keyring_yours.json.");
         }
         Command::Encrypt {text, name, key_file} => {
             let key_file = key_file.trim();
@@ -88,7 +89,9 @@ fn main() -> anyhow::Result<()> {
             let signature = create_signature(&packed_text, &priv_key)
                 .map_err(|e| anyhow!("Could not create signature: {}", e))?;
             let packed_signed_text = pack_signed_message(&packed_text, &signature);
-            println!("\nEncrypted message: {}", packed_signed_text);
+            println!("\nEncrypted message: {}", &packed_signed_text);
+            copy_message_to_clipboard(&packed_signed_text)?;
+            println!("Encrypted message also saved to clipboard.")
         }
         Command::Decrypt {text, key_file, name} => {
             let key_file = key_file.trim();
