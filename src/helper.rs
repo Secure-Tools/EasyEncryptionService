@@ -2,6 +2,7 @@ use std::path::Path;
 use aes_gcm::Aes256Gcm;
 use rpassword;
 use arboard;
+use std::{thread, time::Duration};
 use anyhow::{Result, anyhow};
 
 pub type AesNonce = aes_gcm::aead::Nonce<Aes256Gcm>;
@@ -24,7 +25,11 @@ pub fn ask_for_passphrase() -> Result<String> {
 
 pub fn copy_message_to_clipboard(message : &str) -> Result<()> {
     let mut clipboard = arboard::Clipboard::new()?;
-    Ok(clipboard.set_text(message)?)
+    // Fixes Linux clipboard behaviour by waiting before dropping the clipboard.
+    // This blocks the main thread which is fine for our CLI program but may need to be changed for the future.
+    clipboard.set_text(message)?;
+    thread::sleep(Duration::from_millis(500));
+    Ok(())
 }
 
 #[cfg(test)]
