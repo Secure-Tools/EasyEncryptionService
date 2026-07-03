@@ -55,8 +55,19 @@
 <h2>Easy Encryption Service</h2>
 
 <textarea id="input" placeholder="Paste your text here..."></textarea>
-<textarea id="key" placeholder="Paste their public key here..."></textarea>
-<button id="analyze">Encrypt</button>
+<label for="contactSelect">Recipient</label>
+<select id="contactSelect">
+    <option value="">-- Select a contact --</option>
+</select>
+
+<button type="button" id="deleteContact" style="background: #c62828;">Delete Selected Contact</button>
+
+<details style="margin-top: 6px;">
+    <summary style="font-size: 12px; cursor: pointer;">Add new contact</summary>
+    <input id="newContactName" type="text" placeholder="Name" style="margin-top: 6px;">
+    <textarea id="newContactKey" placeholder="Paste their public key..." style="height: 60px; margin-top: 4px;"></textarea>
+    <button type="button" id="addContact">Save Contact</button>
+</details><button type="button" id="encrypt">Encrypt</button>
 <div id="results">
     <div class="metric"><span>Encrypted Message: </span><span id="sentences">—</span></div>
 </div>
