@@ -5,6 +5,13 @@ async function run() {
     const bytes = await fetch(wasmUrl).then(r => r.arrayBuffer());
     await init({ module_or_path: bytes });
 
+    // Pre-fill from a right-click selection, if any
+    const { pendingText } = await chrome.storage.local.get("pendingText");
+    if (pendingText) {
+        document.getElementById("input").value = pendingText;
+        chrome.storage.local.remove("pendingText"); // consume it so it doesn't linger for next open
+    }
+
     document.getElementById("analyze").addEventListener("click", () => {
         const text = document.getElementById("input").value;
         const key = document.getElementById("key").value;
@@ -13,7 +20,7 @@ async function run() {
     });
 
     document.getElementById("decrypt").addEventListener("click", async () => {
-        const packed = document.getElementById("sentences").textContent;
+        const packed = document.getElementById("input").value;
         const fileInput = document.getElementById("privkey");
         const errorEl = document.getElementById("error");
         errorEl.textContent = "";
