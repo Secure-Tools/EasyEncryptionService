@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Easy Encryption Service</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            width: 320px;
+            padding: 12px;
+            margin: 0;
+        }
+        h2 { margin: 0 0 8px; font-size: 15px; }
+        h3 { margin: 16px 0 6px; font-size: 13px; border-top: 1px solid #eee; padding-top: 10px; }
+        textarea {
+            width: 100%;
+            height: 100px;
+            box-sizing: border-box;
+            resize: vertical;
+            font-size: 13px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="file"] { width: 100%; font-size: 12px; margin-top: 4px; }
+        button {
+            margin-top: 8px;
+            width: 100%;
+            padding: 7px;
+            font-size: 13px;
+            cursor: pointer;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover { background: #1558b0; }
+        #results, #decryptResults {
+            margin-top: 10px;
+            display: none;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .metric:last-child { border-bottom: none; }
+        .metric span:last-child { font-weight: bold; }
+        #error { color: #c00; font-size: 12px; margin-top: 6px; }
+    </style>
+</head>
+<body>
+<h2>Easy Encryption Service</h2>
+
+<textarea id="input" placeholder="Paste your text here..."></textarea>
+<textarea id="key" placeholder="Paste their public key here..."></textarea>
+<button id="analyze">Encrypt</button>
+<div id="results">
+    <div class="metric"><span>Encrypted Message: </span><span id="sentences">—</span></div>
+</div>
+
+<h3>Decrypt</h3>
+<label for="privkey">Your private key file (.pkcs8)</label>
+<input id="privkey" type="file" accept=".pkcs8">
+<button id="decrypt">Decrypt</button>
+<div id="decryptResults">
+    <div class="metric"><span>Decrypted Message: </span><span id="decrypted">—</span></div>
+</div>
+
+<div id="error"></div>
+
+<script type="module" src="popup.js"></script>
+</body>
+</html>
