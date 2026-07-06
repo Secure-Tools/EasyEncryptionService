@@ -1,20 +1,18 @@
-use crate::key_generator::{fetch_key_from_file, generate_rsa_key, save_key_to_file};
-use crate::helper::{u8_to_string, check_priv_key_format};
-use crate::hybrid_encryption::{decrypt_hybrid, encrypt_hybrid_name};
-use crate::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
+use crate::key_io::{fetch_key_from_file, save_key_to_file};
+use ees_core::helper::{u8_to_string, check_priv_key_format};
+use ees_core::hybrid_encryption::{decrypt_hybrid};
+use ees_core::packer::{pack_message, pack_public_key, pack_signed_message, unpack_message, unpack_signed_message};
+use ees_core::signature::{create_signature};
+use ees_core::key_generator::generate_rsa_key;
 use crate::key_store::{delete_contact, list_contacts, store, store_pub_priv_pair};
+use crate::keyring_ops::{encrypt_hybrid_name, verify_signature_name};
 use clap::{Parser, Subcommand};
 use anyhow::anyhow;
-use crate::signature::{create_signature, verify_signature_name};
 
-pub mod key_generator;
-pub mod helper;
-pub mod rsa_service;
-pub mod aes_service;
-pub mod hybrid_encryption;
-pub mod packer;
-pub mod signature;
+
+pub mod key_io;
 pub mod key_store;
+pub mod keyring_ops;
 
 #[derive(Parser)]
 #[command(name = "ees", about = "Easy encryption service CLI tool")]

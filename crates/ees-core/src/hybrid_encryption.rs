@@ -4,7 +4,6 @@ use crate::aes_service::{decrypt_aes, encrypt_aes};
 use crate::rsa_service::{decrypt_rsa, encrypt_rsa};
 use crate::helper::AesNonce;
 use anyhow::{anyhow, Result};
-use crate::key_store::get_enc_key;
 use crate::packer::unpack_public_key;
 
 /// Encrypts the given plain text with AES-GCM and RSA to communicate the text through unencrypted channels.
@@ -27,13 +26,6 @@ pub fn decrypt_hybrid(cipher_text: &[u8], nonce:AesNonce, encrypted_key: &[u8], 
     decrypt_aes(cipher_text, nonce, key)
 }
 
-pub fn encrypt_hybrid_name(plain_text: &[u8], recipient_name:&str) -> Result<(Vec<u8>, AesNonce, Vec<u8>)>{
-    let (cipher_text, nonce, key) = encrypt_aes(plain_text)?;
-    let pub_key = get_enc_key(recipient_name, "keyring.json")
-        .ok_or_else(|| anyhow!("No public key found for {}. Use store command to add.", recipient_name))?;
-    let encrypted_key = encrypt_rsa(&key, &unpack_public_key(&pub_key)?)?;
-    Ok((cipher_text, nonce, encrypted_key))
-}
 #[cfg(test)]
 mod tests {
     use crate::key_generator::generate_rsa_key_test;
