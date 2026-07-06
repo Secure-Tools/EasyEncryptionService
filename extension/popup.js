@@ -1,4 +1,4 @@
-import init, { encrypt_message, decrypt_message } from "./pkg/EasyEncryptionService.js";
+import init, { encrypt_message, decrypt_message } from "./pkg/ees_wasm.js";
 
 // Helpers to persist file containing private key
 function openHandleDB() {
@@ -33,7 +33,7 @@ async function loadHandle() {
 let currentKeyHandle = null;
 
 async function run() {
-    const wasmUrl = chrome.runtime.getURL("pkg/EasyEncryptionService_bg.wasm");
+    const wasmUrl = chrome.runtime.getURL("pkg/ees_wasm_bg.wasm");
     const bytes = await fetch(wasmUrl).then(r => r.arrayBuffer());
     await init({ module_or_path: bytes });
 
@@ -146,7 +146,7 @@ async function run() {
                 if (req !== "granted") {
                     errorEl.textContent = "Permission to read the key file was denied.";
                     return;
-                }
+                }pub_key_b62
             }
             const file = await currentKeyHandle.getFile();
             const buffer = await file.arrayBuffer();

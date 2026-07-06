@@ -7,3 +7,4 @@ keyring_yours.json
 crates/ees-cli/target
 crates/ees-core/target
 crates/ees-wasm/target
+extension/pkg

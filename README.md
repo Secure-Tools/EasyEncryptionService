@@ -98,4 +98,4 @@ Planned features to implement:
 The project is licensed under MIT License which is described in the LICENSE file.
  
 ## Packing into WASM
-Should you do any modifications to the functions exposed to the browser (especially changes in ```lib.rs```), you need to pack the changes into WASM with ```wasm-pack build --target web``` and then move the created ```pkg``` directory into the ```extension``` directory.
+Should you do any modifications to the functions exposed to the browser (especially changes in ```lib.rs```), you need to pack the changes into WASM with ```wasm-pack build crates/ees-wasm --target web``` and then move the created ```pkg``` directory into the ```extension``` directory.
