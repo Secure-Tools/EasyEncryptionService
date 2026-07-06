@@ -1,15 +1,9 @@
-pub mod key_generator;
-pub mod helper;
-pub mod rsa_service;
-pub mod aes_service;
-pub mod hybrid_encryption;
-pub mod packer;
-pub mod signature;
-pub mod key_store;
-
 use wasm_bindgen::prelude::*;
-use crate::hybrid_encryption::encrypt_hybrid;
-use crate::packer::{pack_message, unpack_public_key};
+use ees_core::hybrid_encryption::{encrypt_hybrid, decrypt_hybrid};
+use ees_core::packer::{pack_message, unpack_message, unpack_public_key};
+use ees_core::helper::u8_to_string;
+use rsa::pkcs8::DecodePrivateKey;
+use rsa::RsaPrivateKey;
 
 #[wasm_bindgen]
 pub fn encrypt_message(text: &str, pub_key_b62: &str) -> Result<String, JsValue> {
@@ -19,12 +13,6 @@ pub fn encrypt_message(text: &str, pub_key_b62: &str) -> Result<String, JsValue>
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
     Ok(pack_message(&cipher_text, nonce, &enc_key))
 }
-
-use crate::hybrid_encryption::decrypt_hybrid;
-use crate::packer::unpack_message;
-use crate::helper::u8_to_string;
-use rsa::pkcs8::DecodePrivateKey;
-use rsa::RsaPrivateKey;
 
 #[wasm_bindgen]
 pub fn decrypt_message(packed: &str, priv_key_der: &[u8]) -> Result<String, JsValue> {

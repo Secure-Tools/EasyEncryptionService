@@ -3,7 +3,6 @@ use rsa::{RsaPrivateKey, RsaPublicKey};
 use rsa::pkcs1v15::Pkcs1v15Sign;
 use rsa::signature::digest::Digest;
 use sha2::Sha256;
-use crate::key_store::get_enc_key;
 use crate::packer::unpack_public_key;
 
 pub fn create_signature(cipher_text: &str, priv_key: &RsaPrivateKey) -> Result<Vec<u8>> {
@@ -15,14 +14,6 @@ pub fn create_signature(cipher_text: &str, priv_key: &RsaPrivateKey) -> Result<V
 pub fn verify_signature(cipher_text: &str, signature: &[u8], pub_key: &RsaPublicKey) -> Result<()> {
     let digest = Sha256::digest(cipher_text);
     pub_key.verify(Pkcs1v15Sign::new::<Sha256>(), &digest, signature)
-        .map_err(|e| anyhow!("Verification failed: {:?}", e))
-}
-
-pub fn verify_signature_name(cipher_text: &str, signature: &[u8], name: &str) -> Result<()> {
-    let digest = Sha256::digest(cipher_text);
-    let pub_key = get_enc_key(name, "keyring.json")
-        .ok_or_else(|| anyhow!("No public key found for '{}'. Use store command to add.", name))?;
-    unpack_public_key(&pub_key)?.verify(Pkcs1v15Sign::new::<Sha256>(), &digest, signature)
         .map_err(|e| anyhow!("Verification failed: {:?}", e))
 }
 

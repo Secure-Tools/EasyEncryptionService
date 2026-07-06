@@ -1,0 +1,14 @@
+[package]
+name = "ees-wasm"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ees-core = { path = "../ees-core" }
+wasm-bindgen = "0.2"
+getrandom = { version = "0.2", features = ["js"] }
+getrandom4 = { package = "getrandom", version = "0.4", features = ["wasm_js"] }
+rsa = "0.10.0-rc.17"
