@@ -1,4 +1,4 @@
-import init, { encrypt_message, decrypt_message } from "./pkg/ees_wasm.js";
+import init, { encrypt_message, decrypt_message, generate_and_encrypt_keypair } from "./pkg/ees_wasm.js";
 
 // Helpers to persist file containing private key
 function openHandleDB() {
@@ -48,6 +48,47 @@ async function run() {
             select.appendChild(opt);
         }
     }
+
+
+    document.getElementById("generateKey").addEventListener("click", async () => {
+        const errorEl = document.getElementById("error");
+        errorEl.textContent = "";
+        const passphrase = document.getElementById("newPassphrase").value
+        const confirm = document.getElementById("newPassphraseConfirm").value;
+        if (!passphrase || passphrase !== confirm) {
+            errorEl.textContent = "Passphrases empty or don't match.";
+            return;
+        }
+
+        const status = document.getElementById("keyStatus");
+        status.textContent = "Generating (5-15s)…";
+
+        await new Promise(r => setTimeout(r, 0))
+
+        try {
+            const kp = generate_and_encrypt_keypair(passphrase)
+
+            await chrome.storage.local.set({
+                myPublicKey: kp.public_b62,
+                myEncryptedPrivateKey: Array.from(kp.encrypted_private_der)
+            });
+            status.textContent = "Keypair generated.";
+            document.getElementById("myPublicKey").value = kp.public_b62;
+        } catch(err) {
+            errorEl.textContent = `Generation failed: ${err.message || err}`;
+            status.textContent = "";
+        } finally {
+            document.getElementById("newPassphrase").value = "";
+            document.getElementById("newPassphraseConfirm").value = "";
+        }
+
+    });
+
+    const stored = chrome.storage.local.get(["myPublicKey"])
+    if (stored.myPublicKey) {
+        document.getElementById("myPublicKey").value = stored.myPublicKey
+    }
+
 
     document.getElementById("selectKey").addEventListener("click", async () => {
         try {
