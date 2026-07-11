@@ -85,12 +85,12 @@
 </div>
 
 <h3>Decrypt</h3>
-<label for="selectKey">Your private key file (.pkcs8)</label>
-<button type="button" id="selectKey">Select Key File</button>
-<span id="keyFileName" style="font-size: 12px; color: #555;">No file selected</span><button id="decrypt">Decrypt</button>
+<input id="unlockPassphrase" type="password" placeholder="Your passphrase">
+<button id="decrypt">Decrypt</button>
 <div id="decryptResults">
     <div class="metric"><span>Decrypted Message: </span><span id="decrypted">—</span></div>
 </div>
+
 
 <div id="error"></div>
 
